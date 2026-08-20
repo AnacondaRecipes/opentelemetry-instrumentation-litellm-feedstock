@@ -1,51 +1,55 @@
 {% set name = "opentelemetry-instrumentation-litellm" %}
-{% set version = "0.1.0" %}
-{% set python_min = "3.10" %}
+{% set version = "0.62.1" %}
 
 package:
-  name: {{ name|lower }}
+  name: {{ name }}
   version: {{ version }}
 
 source:
-  url: https://pypi.org/packages/source/{{ name[0] }}/{{ name }}/opentelemetry_instrumentation_litellm-{{ version }}.tar.gz
-  sha256: 2e2b9c2b8995711d8a5bc7f4636bf6da2a88680d15e006685bba22b4e9cfe174
+  url: https://github.com/traceloop/openllmetry/archive/refs/tags/0.62.1.tar.gz
+  sha256: dee2e822666df74e84b9e41080b0e9f6702b892a8723d6ae981a22bc4ef8b271
 
 build:
-  noarch: python
-  script: {{ PYTHON }} -m pip install . -vv --no-deps --no-build-isolation
   number: 0
+  script: {{ PYTHON }} -m pip install ./packages/opentelemetry-instrumentation-litellm -vv --no-deps --no-build-isolation
+  skip: true  # [py<310]
 
 requirements:
   host:
-    - python {{ python_min }}
-    - hatchling
     - pip
+    - python
+    - hatchling
   run:
-    - python >={{ python_min }}
+    - python
     - opentelemetry-api >=1.38.0,<2.0.0
     - opentelemetry-instrumentation >=0.59b0
-    - opentelemetry-semantic-conventions >=0.63b1
     - opentelemetry-semantic-conventions-ai >=0.5.1,<0.6.0
+    - opentelemetry-semantic-conventions >=0.63b1
   run_constrained:
-    - litellm >=1.0.0
+    - litellm >=1.40.0
 
 test:
   imports:
     - opentelemetry.instrumentation.litellm
   commands:
-    - pip check
+    # litellm 1.83.7 has requirement aiohttp==3.13.5, but you have aiohttp 3.14.3.
+    # litellm 1.83.7 has requirement openai==2.30.0, but you have openai 2.49.0.
+    # litellm 1.83.7 has requirement tokenizers==0.22.2, but you have tokenizers 0.23.1.
+    # No new litellm for py314
+    - pip check  # [py<314]
   requires:
-    - litellm
     - pip
-    - python {{ python_min }}
+    - litellm >=1.40.0
 
 about:
   home: https://www.traceloop.com/openllmetry
   dev_url: https://github.com/traceloop/openllmetry
   doc_url: https://www.traceloop.com/docs/openllmetry/introduction
   summary: OpenTelemetry LiteLLM instrumentation
+  description: OpenTelemetry LiteLLM instrumentation
   license: Apache-2.0
   license_file: LICENSE
+  license_family: Apache
 
 extra:
   recipe-maintainers:
