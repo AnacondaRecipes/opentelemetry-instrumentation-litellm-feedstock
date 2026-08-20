@@ -32,7 +32,11 @@ test:
   imports:
     - opentelemetry.instrumentation.litellm
   commands:
-    - pip check
+    # litellm 1.83.7 has requirement aiohttp==3.13.5, but you have aiohttp 3.14.3.
+    # litellm 1.83.7 has requirement openai==2.30.0, but you have openai 2.49.0.
+    # litellm 1.83.7 has requirement tokenizers==0.22.2, but you have tokenizers 0.23.1.
+    # No new litellm for py314
+    - pip check  # [py<314]
   requires:
     - pip
     - litellm >=1.40.0
